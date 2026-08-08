@@ -16,4 +16,4 @@ test:
 	go test ./...
 
 build:
-	GOOS=windows GOARCH=amd64 go build -o bin/app.exe ./cmd/app
+	CGO_ENABLED=1 GOOS=windows GOARCH=amd64 go build -o bin/app.exe ./cmd/app

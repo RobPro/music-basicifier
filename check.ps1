@@ -6,4 +6,5 @@ golangci-lint run
 if ($LASTEXITCODE -ne 0) { exit 1 }
 go test ./...
 if ($LASTEXITCODE -ne 0) { exit 1 }
+$env:CGO_ENABLED = "1"
 go build -o bin\app.exe .\cmd\app

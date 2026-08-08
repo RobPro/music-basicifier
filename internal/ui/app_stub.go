@@ -7,5 +7,5 @@ import "errors"
 
 // Run returns an error when the binary is built without CGO support.
 func Run() error {
-	return errors.New("ui requires cgo-enabled build on Windows")
+	return errors.New("ui requires cgo-enabled build on Windows (build with CGO_ENABLED=1)")
 }
