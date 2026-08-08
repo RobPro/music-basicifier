@@ -32,6 +32,16 @@ func buildMainWindow(a fyne.App) fyne.Window {
 	})
 
 	audioInput := container.NewBorder(nil, nil, nil, browseButton, audioFileEntry)
+	confirmButton := widget.NewButton("Confirm", func() {
+		dialog.ShowInformation("Input received", buildConfirmationMessage(urlEntry.Text, audioFileEntry.Text), w)
+	})
+
+	urlEntry.OnSubmitted = func(_ string) {
+		confirmButton.OnTapped()
+	}
+	audioFileEntry.OnSubmitted = func(_ string) {
+		confirmButton.OnTapped()
+	}
 
 	content := container.NewVBox(
 		widget.NewLabel("Input"),
@@ -39,6 +49,7 @@ func buildMainWindow(a fyne.App) fyne.Window {
 			widget.NewFormItem("YouTube URL", urlEntry),
 			widget.NewFormItem("Audio File", audioInput),
 		),
+		confirmButton,
 	)
 
 	w.SetContent(content)
