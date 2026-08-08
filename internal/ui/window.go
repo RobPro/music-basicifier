@@ -47,7 +47,6 @@ func buildMainWindow(a fyne.App) fyne.Window {
 			dialog.ShowInformation("Input received", buildConfirmationMessage(url, outputPath), w)
 			return
 		}
-
 		dialog.ShowInformation("Input received", buildConfirmationMessage(urlEntry.Text, audioFileEntry.Text), w)
 	})
 
