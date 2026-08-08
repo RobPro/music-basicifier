@@ -6,7 +6,7 @@ Take music from YouTube, or an imported audio file, and convert it into code usa
 ## Roadmap for v1
 - [x] 0. Skeleton app with empty window
 - [x] 1. Input can be a YouTube URL. Example, to use for testing: https://www.youtube.com/watch?v=siCmqvfw_1g (this is No Copyright Music free to use or modify).
-- [ ] 2. Alternatively, input can be a wav, m4u or mp3 audio file. Example, to use for testing: C:\source\music-basicifier\example-input\Useless-Station.wav (copyright owned).
+- [x] 2. Alternatively, input can be a wav, m4u or mp3 audio file. Example, to use for testing: C:\source\music-basicifier\example-input\Useless-Station.wav (copyright owned).
 - [ ] 3. Once input is given, user confirms with a button click or "Enter" keypress.
 - [ ] 4. If input is a YouTube URL, it obtains the audio from it. Use yt-dlp library to extract the audio.
 - [ ] 5. Open the audio file and extract the main melody from it.
