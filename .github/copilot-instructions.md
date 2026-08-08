@@ -44,6 +44,11 @@ making changes. If it fails, fix the issue and re-run before reporting
 completion. Do not report a task as done with a failing build, vet, or
 test.
 
+## Failure handling
+If `make check` fails, attempt at most 2 fixes. If still failing after 2
+attempts, STOP and report the failure with full output rather than trying
+further changes. Do not proceed to additional features while checks are red.
+
 ## Style
 - Standard Go formatting (`gofmt`/`goimports`) is mandatory.
 - Prefer explicit error handling over panics; no swallowed errors.
