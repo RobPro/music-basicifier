@@ -17,9 +17,6 @@ jobs:
       - run: go build ./...
       - run: go vet ./...
       - run: go test ./...
-name: ci
-on: pull_request
-jobs:
   build-test:
     runs-on: windows-latest
     steps:
