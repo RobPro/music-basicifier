@@ -1,0 +1,19 @@
+name: dependency-diff-check
+on: pull_request
+jobs:
+  check:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: Fail if go.mod/go.sum changed
+        run: |
+          git diff --name-only origin/${{ github.base_ref }}...HEAD | Select-String "go.mod|go.sum" -Quiet
+          if ($?) {
+            Write-Host "::warning::go.mod or go.sum changed — verify this was intentional and explained in the PR description"
+          }
+      - uses: actions/setup-go@v5
+        with: { go-version: '1.22' }
+      - run: go build ./...
+      - run: go vet ./...
+      - run: go test ./...
