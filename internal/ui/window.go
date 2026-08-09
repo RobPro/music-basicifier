@@ -46,6 +46,13 @@ func buildEmptyPreviewText() string {
 	return "No output yet. Confirm an input to generate preview text."
 }
 
+func buildPreviewStatusText(hasOutput bool) string {
+	if hasOutput {
+		return "Preview ready"
+	}
+	return "Waiting for input"
+}
+
 func buildMainWindow(a fyne.App) fyne.Window {
 	w := a.NewWindow(mainWindowTitle)
 	urlEntry := widget.NewEntry()
@@ -69,6 +76,7 @@ func buildMainWindow(a fyne.App) fyne.Window {
 	outputPreview := widget.NewMultiLineEntry()
 	outputPreview.SetText(buildEmptyPreviewText())
 	outputPreview.Disable()
+	previewStatus := widget.NewLabel(buildPreviewStatusText(false))
 	confirmButton := widget.NewButton("Confirm", func() {
 		if url := urlEntry.Text; url != "" {
 			downloadDir := filepath.Join("C:/", "source", "music-basicifier", "downloads")
@@ -101,6 +109,7 @@ func buildMainWindow(a fyne.App) fyne.Window {
 			return
 		}
 		outputPreview.SetText(buildPreviewText(bundle))
+		previewStatus.SetText(buildPreviewStatusText(true))
 		dialog.ShowInformation("Input received", buildConfirmationMessage(urlEntry.Text, audioFileEntry.Text), w)
 	})
 
@@ -128,6 +137,7 @@ func buildMainWindow(a fyne.App) fyne.Window {
 		confirmButton,
 		widget.NewLabel("Output Preview"),
 		outputPreview,
+		previewStatus,
 		copyButton,
 	)
 
