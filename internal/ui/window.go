@@ -36,6 +36,8 @@ func buildMainWindow(a fyne.App) fyne.Window {
 	})
 
 	audioInput := container.NewBorder(nil, nil, nil, browseButton, audioFileEntry)
+	outputPreview := widget.NewMultiLineEntry()
+	outputPreview.Disable()
 	confirmButton := widget.NewButton("Confirm", func() {
 		if url := urlEntry.Text; url != "" {
 			downloadDir := filepath.Join("C:/", "source", "music-basicifier", "downloads")
@@ -55,6 +57,14 @@ func buildMainWindow(a fyne.App) fyne.Window {
 			return
 		}
 
+		input := &platform.ConversionInput{Melody: &platform.MelodyData{Notes: []platform.MelodyNote{{Pitch: "C", Duration: 1}}}}
+		bundle, err := platform.GenerateOutputBundle(input)
+		if err != nil {
+			_ = platform.LogError(fmt.Sprintf("could not generate outputs: %v", err))
+			dialog.ShowError(fmt.Errorf("could not generate outputs: %w", err), w)
+			return
+		}
+		outputPreview.SetText(bundle.QBASIC + "\n\n" + bundle.Adafruit)
 		dialog.ShowInformation("Input received", buildConfirmationMessage(urlEntry.Text, audioFileEntry.Text), w)
 	})
 
@@ -80,6 +90,8 @@ func buildMainWindow(a fyne.App) fyne.Window {
 			widget.NewFormItem("Audio File", audioInput),
 		),
 		confirmButton,
+		widget.NewLabel("Output Preview"),
+		outputPreview,
 		copyButton,
 	)
 
