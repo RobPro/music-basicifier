@@ -63,6 +63,14 @@ func buildMainWindow(a fyne.App) fyne.Window {
 		confirmButton.OnTapped()
 	}
 
+	copyButton := widget.NewButton("Copy Output", func() {
+		if err := platform.CopyTextToClipboard("Sample output"); err != nil {
+			dialog.ShowError(fmt.Errorf("could not copy output: %w", err), w)
+			return
+		}
+		dialog.ShowInformation("Copied", "Output copied to clipboard", w)
+	})
+
 	content := container.NewVBox(
 		widget.NewLabel("Input"),
 		widget.NewForm(
@@ -70,6 +78,7 @@ func buildMainWindow(a fyne.App) fyne.Window {
 			widget.NewFormItem("Audio File", audioInput),
 		),
 		confirmButton,
+		copyButton,
 	)
 
 	w.SetContent(content)
