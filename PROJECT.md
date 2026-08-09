@@ -13,7 +13,7 @@ Take music from YouTube, or an imported audio file, and convert it into code usa
   - [x] 5.1. Accept a local audio file path and validate that the file exists and is readable.
   - [x] 5.2. Decode the audio file and isolate a single dominant melody stream into a temporary representation.
   - [x] 5.3. Expose the extracted melody data to the downstream conversion layer with clear error handling for unsupported or unreadable files.
-- [ ] 6. Convert the melody into 2 text outputs - 
+- [x] 6. Convert the melody into 2 text outputs - 
 - [ ] 7. The first text output will be a QBASIC program that will perform a close imitation using the PLAY and SOUND commands
 - [ ] 8. The second text output will be JavaScript compatible with Makecode Adafruit. An example output for Adafruit can be found at C:\source\music-basicifier\example-output\chariots-of-fire.js
 - [ ] 9. Text outputs can be easily copied to the Windows clipboard.
