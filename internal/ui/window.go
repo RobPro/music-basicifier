@@ -16,6 +16,14 @@ import (
 
 const mainWindowTitle = "Music Basicifier"
 
+func buildConversionInputFromAudioFile(path string) (*platform.ConversionInput, error) {
+	melody, err := platform.ExtractMelodyFromAudioFile(path)
+	if err != nil {
+		return nil, err
+	}
+	return platform.BuildConversionInput(melody)
+}
+
 func buildMainWindow(a fyne.App) fyne.Window {
 	w := a.NewWindow(mainWindowTitle)
 	urlEntry := widget.NewEntry()
@@ -57,7 +65,12 @@ func buildMainWindow(a fyne.App) fyne.Window {
 			return
 		}
 
-		input := &platform.ConversionInput{Melody: &platform.MelodyData{Notes: []platform.MelodyNote{{Pitch: "C", Duration: 1}}}}
+		input, err := buildConversionInputFromAudioFile(audioFileEntry.Text)
+		if err != nil {
+			_ = platform.LogError(fmt.Sprintf("could not extract melody: %v", err))
+			dialog.ShowError(fmt.Errorf("could not extract melody: %w", err), w)
+			return
+		}
 		bundle, err := platform.GenerateOutputBundle(input)
 		if err != nil {
 			_ = platform.LogError(fmt.Sprintf("could not generate outputs: %v", err))
