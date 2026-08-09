@@ -42,6 +42,10 @@ func buildErrorMessage(err error) string {
 	return err.Error()
 }
 
+func buildEmptyPreviewText() string {
+	return "No output yet. Confirm an input to generate preview text."
+}
+
 func buildMainWindow(a fyne.App) fyne.Window {
 	w := a.NewWindow(mainWindowTitle)
 	urlEntry := widget.NewEntry()
@@ -63,6 +67,7 @@ func buildMainWindow(a fyne.App) fyne.Window {
 
 	audioInput := container.NewBorder(nil, nil, nil, browseButton, audioFileEntry)
 	outputPreview := widget.NewMultiLineEntry()
+	outputPreview.SetText(buildEmptyPreviewText())
 	outputPreview.Disable()
 	confirmButton := widget.NewButton("Confirm", func() {
 		if url := urlEntry.Text; url != "" {
