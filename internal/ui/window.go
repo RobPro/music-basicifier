@@ -45,8 +45,9 @@ func buildMainWindow(a fyne.App) fyne.Window {
 			downloadDir := filepath.Join("C:/", "source", "music-basicifier", "downloads")
 			outputPath, err := platform.DownloadYouTubeAudio(url, downloadDir)
 			if err != nil {
-				_ = platform.LogError(fmt.Sprintf("could not download YouTube audio: %v", err))
-				dialog.ShowError(fmt.Errorf("could not download YouTube audio: %w", err), w)
+				wrapped := fmt.Errorf("could not download YouTube audio: %w", err)
+				logErrorWithContext("download YouTube audio", err)
+				dialog.ShowError(fmt.Errorf("%s", buildErrorMessage(wrapped)), w)
 				return
 			}
 			dialog.ShowInformation("Input received", buildConfirmationMessage(url, outputPath), w)
@@ -54,21 +55,24 @@ func buildMainWindow(a fyne.App) fyne.Window {
 		}
 
 		if err := platform.ValidateAudioFilePath(audioFileEntry.Text); err != nil {
-			_ = platform.LogError(fmt.Sprintf("invalid audio file: %v", err))
-			dialog.ShowError(fmt.Errorf("invalid audio file: %w", err), w)
+			wrapped := fmt.Errorf("invalid audio file: %w", err)
+			logErrorWithContext("validate audio file", err)
+			dialog.ShowError(fmt.Errorf("%s", buildErrorMessage(wrapped)), w)
 			return
 		}
 
 		input, err := buildConversionInputFromAudioFile(audioFileEntry.Text)
 		if err != nil {
-			_ = platform.LogError(fmt.Sprintf("could not extract melody: %v", err))
-			dialog.ShowError(fmt.Errorf("could not extract melody: %s", buildErrorMessage(err)), w)
+			wrapped := fmt.Errorf("could not extract melody: %w", err)
+			logErrorWithContext("extract melody", err)
+			dialog.ShowError(fmt.Errorf("%s", buildErrorMessage(wrapped)), w)
 			return
 		}
 		bundle, err := platform.GenerateOutputBundle(input)
 		if err != nil {
-			_ = platform.LogError(fmt.Sprintf("could not generate outputs: %v", err))
-			dialog.ShowError(fmt.Errorf("could not generate outputs: %s", buildErrorMessage(err)), w)
+			wrapped := fmt.Errorf("could not generate outputs: %w", err)
+			logErrorWithContext("generate outputs", err)
+			dialog.ShowError(fmt.Errorf("%s", buildErrorMessage(wrapped)), w)
 			return
 		}
 		outputPreview.SetText(buildPreviewText(bundle))
@@ -86,11 +90,15 @@ func buildMainWindow(a fyne.App) fyne.Window {
 	copyButton := widget.NewButton("Copy Output", func() {
 		copyText, err := buildCopyText(outputPreview.Text)
 		if err != nil {
-			dialog.ShowError(fmt.Errorf("could not copy output: %w", err), w)
+			wrapped := fmt.Errorf("could not copy output: %w", err)
+			logErrorWithContext("copy output", err)
+			dialog.ShowError(fmt.Errorf("%s", buildErrorMessage(wrapped)), w)
 			return
 		}
 		if err := platform.CopyTextToClipboard(copyText); err != nil {
-			dialog.ShowError(fmt.Errorf("could not copy output: %w", err), w)
+			wrapped := fmt.Errorf("could not copy output: %w", err)
+			logErrorWithContext("copy output", err)
+			dialog.ShowError(fmt.Errorf("%s", buildErrorMessage(wrapped)), w)
 			return
 		}
 		dialog.ShowInformation("Copied", "Output copied to clipboard", w)
