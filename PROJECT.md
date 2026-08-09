@@ -7,9 +7,12 @@ Take music from YouTube, or an imported audio file, and convert it into code usa
 - [x] 0. Skeleton app with empty window
 - [x] 1. Input can be a YouTube URL. Example, to use for testing: https://www.youtube.com/watch?v=siCmqvfw_1g (this is No Copyright Music free to use or modify).
 - [x] 2. Alternatively, input can be a wav, m4u or mp3 audio file. Example, to use for testing: C:\source\music-basicifier\example-input\Useless-Station.wav (copyright owned).
-- [ ] 3. Once input is given, user confirms with a button click or "Enter" keypress.
-- [ ] 4. If input is a YouTube URL, it obtains the audio from it. Use yt-dlp library to extract the audio.
+- [x] 3. Once input is given, user confirms with a button click or "Enter" keypress.
+- [x] 4. If input is a YouTube URL, it obtains the audio from it. Use yt-dlp library to extract the audio.
 - [ ] 5. Open the audio file and extract the main melody from it.
+  - [ ] 5.1. Accept a local audio file path and validate that the file exists and is readable.
+  - [ ] 5.2. Decode the audio file and isolate a single dominant melody stream into a temporary representation.
+  - [ ] 5.3. Expose the extracted melody data to the downstream conversion layer with clear error handling for unsupported or unreadable files.
 - [ ] 6. Convert the melody into 2 text outputs - 
 - [ ] 7. The first text output will be a QBASIC program that will perform a close imitation using the PLAY and SOUND commands
 - [ ] 8. The second text output will be JavaScript compatible with Makecode Adafruit. An example output for Adafruit can be found at C:\source\music-basicifier\example-output\chariots-of-fire.js
