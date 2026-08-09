@@ -45,14 +45,17 @@ func TestExtractMelodyFromAudioFileParsesSimpleWav(t *testing.T) {
 	if err != nil {
 		t.Fatalf("expected melody extraction to succeed: %v", err)
 	}
-	if len(data.Notes) == 0 {
-		t.Fatal("expected at least one melody note")
+	if len(data.Notes) < 2 {
+		t.Fatalf("expected a note stream with multiple notes, got %d", len(data.Notes))
 	}
 	if got := data.Notes[0].Pitch; got != "A" {
 		t.Fatalf("expected extracted pitch A, got %s", got)
 	}
 	if data.Notes[0].Duration <= 0 {
 		t.Fatal("expected a positive note duration")
+	}
+	if data.Notes[1].Duration <= 0 {
+		t.Fatal("expected a positive duration for the second note")
 	}
 }
 
