@@ -22,3 +22,15 @@ func TestGenerateAdafruitJavaScriptRendersNotes(t *testing.T) {
 		t.Fatalf("expected JavaScript output header, got %q", program)
 	}
 }
+
+func TestGenerateAdafruitJavaScriptRejectsInvalidNotes(t *testing.T) {
+	_, err := GenerateAdafruitJavaScript(&ConversionInput{Melody: &MelodyData{Notes: []MelodyNote{{Pitch: "", Duration: 1}}}})
+	if err == nil {
+		t.Fatal("expected empty pitch to fail")
+	}
+
+	_, err = GenerateAdafruitJavaScript(&ConversionInput{Melody: &MelodyData{Notes: []MelodyNote{{Pitch: "C", Duration: 0}}}})
+	if err == nil {
+		t.Fatal("expected invalid duration to fail")
+	}
+}

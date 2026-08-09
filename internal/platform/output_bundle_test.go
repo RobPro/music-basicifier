@@ -1,6 +1,9 @@
 package platform
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 func TestGenerateOutputBundleRequiresInput(t *testing.T) {
 	_, err := GenerateOutputBundle(nil)
@@ -20,5 +23,16 @@ func TestGenerateOutputBundleBuildsBothOutputs(t *testing.T) {
 	}
 	if bundle.QBASIC == "" || bundle.Adafruit == "" {
 		t.Fatal("expected both outputs to be populated")
+	}
+}
+
+func TestGenerateOutputBundleWrapsQBasicError(t *testing.T) {
+	input := &ConversionInput{Melody: &MelodyData{Notes: []MelodyNote{{Pitch: "", Duration: 1}}}}
+	_, err := GenerateOutputBundle(input)
+	if err == nil {
+		t.Fatal("expected QBASIC generation to fail")
+	}
+	if !strings.Contains(err.Error(), "generate QBASIC output") {
+		t.Fatalf("unexpected error: %v", err)
 	}
 }

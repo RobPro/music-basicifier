@@ -15,5 +15,13 @@ func BuildConversionInput(melody *MelodyData) (*ConversionInput, error) {
 	if len(melody.Notes) == 0 {
 		return nil, fmt.Errorf("melody data must contain at least one note")
 	}
+	for i, note := range melody.Notes {
+		if note.Pitch == "" {
+			return nil, fmt.Errorf("melody note %d has empty pitch", i)
+		}
+		if note.Duration <= 0 {
+			return nil, fmt.Errorf("melody note %d has invalid duration", i)
+		}
+	}
 	return &ConversionInput{Melody: melody}, nil
 }
