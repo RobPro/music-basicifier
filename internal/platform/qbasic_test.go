@@ -25,3 +25,15 @@ func TestGenerateQBASICProgramRendersNotes(t *testing.T) {
 		t.Fatalf("expected program to contain %q, got %q", want, program)
 	}
 }
+
+func TestGenerateQBASICProgramRejectsInvalidNotes(t *testing.T) {
+	_, err := GenerateQBASICProgram(&ConversionInput{Melody: &MelodyData{Notes: []MelodyNote{{Pitch: "", Duration: 1}}}})
+	if err == nil {
+		t.Fatal("expected empty pitch to fail")
+	}
+
+	_, err = GenerateQBASICProgram(&ConversionInput{Melody: &MelodyData{Notes: []MelodyNote{{Pitch: "C", Duration: 0}}}})
+	if err == nil {
+		t.Fatal("expected invalid duration to fail")
+	}
+}

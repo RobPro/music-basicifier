@@ -1,6 +1,9 @@
 package platform
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 func TestBuildConversionInputRequiresMelodyData(t *testing.T) {
 	_, err := BuildConversionInput(nil)
@@ -17,5 +20,25 @@ func TestBuildConversionInputAcceptsMelodyData(t *testing.T) {
 	}
 	if input == nil || input.Melody != melody {
 		t.Fatal("expected conversion input to retain melody data")
+	}
+}
+
+func TestBuildConversionInputRejectsEmptyPitch(t *testing.T) {
+	_, err := BuildConversionInput(&MelodyData{Notes: []MelodyNote{{Pitch: "", Duration: 1}}})
+	if err == nil {
+		t.Fatal("expected error for empty pitch")
+	}
+	if !strings.Contains(err.Error(), "empty pitch") {
+		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func TestBuildConversionInputRejectsInvalidDuration(t *testing.T) {
+	_, err := BuildConversionInput(&MelodyData{Notes: []MelodyNote{{Pitch: "C", Duration: 0}}})
+	if err == nil {
+		t.Fatal("expected error for invalid duration")
+	}
+	if !strings.Contains(err.Error(), "invalid duration") {
+		t.Fatalf("unexpected error: %v", err)
 	}
 }

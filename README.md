@@ -48,6 +48,30 @@ gcc --version
 
 If `gcc` is not found, close and reopen VS Code, then try again.
 
+Known working local path example:
+
+```text
+C:\Users\rtown\AppData\Local\Microsoft\WinGet\Packages\MartinStorsjo.LLVM-MinGW.UCRT_Microsoft.Winget.Source_8wekyb3d8bbwe\llvm-mingw-20260616-ucrt-x86_64\bin
+```
+
+If it is not on `PATH`, add it for the current PowerShell session:
+
+```powershell
+$gccBin = "C:\Users\rtown\AppData\Local\Microsoft\WinGet\Packages\MartinStorsjo.LLVM-MinGW.UCRT_Microsoft.Winget.Source_8wekyb3d8bbwe\llvm-mingw-20260616-ucrt-x86_64\bin"
+$env:Path = "$gccBin;$env:Path"
+$env:CC = "$gccBin\gcc.exe"
+$env:CXX = "$gccBin\g++.exe"
+```
+
+Then verify:
+
+```powershell
+Get-Command gcc | Format-List Source
+gcc --version
+```
+
+Note: LLVM MinGW's `gcc.exe` frontend reports a Clang version string. That is expected.
+
 ## 3) golangci-lint (required for checks)
 
 The project check script runs `golangci-lint`.
@@ -157,7 +181,16 @@ Cause:
 Fix:
 1. Install LLVM MinGW via `winget`.
 2. Restart terminal/VS Code so `PATH` updates are loaded.
-3. Re-run `gcc --version` and then re-run `./check.ps1`.
+3. If needed, prepend the LLVM MinGW `bin` directory to `PATH` in the current PowerShell session and set `CC`/`CXX`:
+
+```powershell
+$gccBin = "C:\Users\rtown\AppData\Local\Microsoft\WinGet\Packages\MartinStorsjo.LLVM-MinGW.UCRT_Microsoft.Winget.Source_8wekyb3d8bbwe\llvm-mingw-20260616-ucrt-x86_64\bin"
+$env:Path = "$gccBin;$env:Path"
+$env:CC = "$gccBin\gcc.exe"
+$env:CXX = "$gccBin\g++.exe"
+```
+
+4. Re-run `gcc --version` and then re-run `./check.ps1`.
 
 ## Project Layout (high level)
 

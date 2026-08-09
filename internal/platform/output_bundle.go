@@ -16,11 +16,11 @@ func GenerateOutputBundle(input *ConversionInput) (*OutputBundle, error) {
 
 	qbasic, err := GenerateQBASICProgram(input)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("generate QBASIC output: %w", err)
 	}
 	adafruit, err := GenerateAdafruitJavaScript(input)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("generate Adafruit output: %w", err)
 	}
 
 	return &OutputBundle{QBASIC: qbasic, Adafruit: adafruit}, nil
