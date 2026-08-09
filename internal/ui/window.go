@@ -47,6 +47,12 @@ func buildMainWindow(a fyne.App) fyne.Window {
 			dialog.ShowInformation("Input received", buildConfirmationMessage(url, outputPath), w)
 			return
 		}
+
+		if err := platform.ValidateAudioFilePath(audioFileEntry.Text); err != nil {
+			dialog.ShowError(fmt.Errorf("invalid audio file: %w", err), w)
+			return
+		}
+
 		dialog.ShowInformation("Input received", buildConfirmationMessage(urlEntry.Text, audioFileEntry.Text), w)
 	})
 
