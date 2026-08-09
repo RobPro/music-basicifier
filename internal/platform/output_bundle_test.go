@@ -24,6 +24,9 @@ func TestGenerateOutputBundleBuildsBothOutputs(t *testing.T) {
 	if bundle.QBASIC == "" || bundle.Adafruit == "" {
 		t.Fatal("expected both outputs to be populated")
 	}
+	if !strings.Contains(bundle.Adafruit, "music.playTone(") {
+		t.Fatalf("expected Adafruit output to use playTone, got %q", bundle.Adafruit)
+	}
 }
 
 func TestGenerateOutputBundleWrapsQBasicError(t *testing.T) {
