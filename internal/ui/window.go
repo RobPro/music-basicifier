@@ -31,6 +31,17 @@ func buildPreviewText(bundle *platform.OutputBundle) string {
 	return bundle.QBASIC + "\n\n" + bundle.Adafruit
 }
 
+func buildCopyText(preview string) string {
+	return preview
+}
+
+func buildErrorMessage(err error) string {
+	if err == nil {
+		return ""
+	}
+	return err.Error()
+}
+
 func buildMainWindow(a fyne.App) fyne.Window {
 	w := a.NewWindow(mainWindowTitle)
 	urlEntry := widget.NewEntry()
@@ -75,13 +86,13 @@ func buildMainWindow(a fyne.App) fyne.Window {
 		input, err := buildConversionInputFromAudioFile(audioFileEntry.Text)
 		if err != nil {
 			_ = platform.LogError(fmt.Sprintf("could not extract melody: %v", err))
-			dialog.ShowError(fmt.Errorf("could not extract melody: %w", err), w)
+			dialog.ShowError(fmt.Errorf("could not extract melody: %s", buildErrorMessage(err)), w)
 			return
 		}
 		bundle, err := platform.GenerateOutputBundle(input)
 		if err != nil {
 			_ = platform.LogError(fmt.Sprintf("could not generate outputs: %v", err))
-			dialog.ShowError(fmt.Errorf("could not generate outputs: %w", err), w)
+			dialog.ShowError(fmt.Errorf("could not generate outputs: %s", buildErrorMessage(err)), w)
 			return
 		}
 		outputPreview.SetText(buildPreviewText(bundle))
@@ -96,7 +107,7 @@ func buildMainWindow(a fyne.App) fyne.Window {
 	}
 
 	copyButton := widget.NewButton("Copy Output", func() {
-		if err := platform.CopyTextToClipboard("Sample output"); err != nil {
+		if err := platform.CopyTextToClipboard(buildCopyText(outputPreview.Text)); err != nil {
 			dialog.ShowError(fmt.Errorf("could not copy output: %w", err), w)
 			return
 		}
