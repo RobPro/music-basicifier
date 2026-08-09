@@ -43,7 +43,7 @@ func ExtractMelodyFromAudioFile(path string) (*MelodyData, error) {
 		return nil, fmt.Errorf("read audio file: %w", err)
 	}
 
-	pitch, duration, err := extractPitchFromWAV(data)
+	notes, err := extractNoteStreamFromWAV(data)
 	if err != nil {
 		baseName := strings.TrimSuffix(filepath.Base(path), filepath.Ext(path))
 		if strings.TrimSpace(baseName) == "" {
@@ -59,31 +59,72 @@ func ExtractMelodyFromAudioFile(path string) (*MelodyData, error) {
 
 	return &MelodyData{
 		SourcePath: path,
-		Notes:      []MelodyNote{{Pitch: pitch, Duration: duration}},
+		Notes:      notes,
 	}, nil
 }
 
-func extractPitchFromWAV(data []byte) (string, int, error) {
+func extractNoteStreamFromWAV(data []byte) ([]MelodyNote, error) {
+	samples, sampleRate, err := extractPCMFrames(data)
+	if err != nil {
+		return nil, err
+	}
+	if len(samples) < 2 {
+		return nil, fmt.Errorf("not enough audio samples")
+	}
+
+	windowSize := sampleRate / 8
+	if windowSize < 2 {
+		windowSize = 2
+	}
+
+	var notes []MelodyNote
+	for start := 0; start < len(samples); start += windowSize {
+		end := start + windowSize
+		if end > len(samples) {
+			end = len(samples)
+		}
+		if end-start < 2 {
+			continue
+		}
+
+		frequency := estimateFrequency(samples[start:end], sampleRate)
+		if frequency <= 0 {
+			continue
+		}
+
+		duration := int(math.Ceil(float64(end-start) / float64(sampleRate) * 4))
+		if duration < 1 {
+			duration = 1
+		}
+		notes = append(notes, MelodyNote{Pitch: noteNameForFrequency(frequency), Duration: duration})
+	}
+	if len(notes) == 0 {
+		return nil, fmt.Errorf("unable to estimate note stream")
+	}
+	return notes, nil
+}
+
+func extractPCMFrames(data []byte) ([]float64, int, error) {
 	if len(data) < 44 {
-		return "", 0, fmt.Errorf("wav data is too small")
+		return nil, 0, fmt.Errorf("wav data is too small")
 	}
 	if !bytes.Equal(data[:4], []byte("RIFF")) || !bytes.Equal(data[8:12], []byte("WAVE")) {
-		return "", 0, fmt.Errorf("not a wav file")
+		return nil, 0, fmt.Errorf("not a wav file")
 	}
 
 	audioFormat := int(binary.LittleEndian.Uint16(data[20:22]))
 	if audioFormat != 1 {
-		return "", 0, fmt.Errorf("unsupported wav format")
+		return nil, 0, fmt.Errorf("unsupported wav format")
 	}
 
 	numChannels := int(binary.LittleEndian.Uint16(data[22:24]))
 	sampleRate := int(binary.LittleEndian.Uint32(data[24:28]))
 	bitsPerSample := int(binary.LittleEndian.Uint16(data[34:36]))
 	if numChannels <= 0 || sampleRate <= 0 || bitsPerSample <= 0 {
-		return "", 0, fmt.Errorf("invalid wav header")
+		return nil, 0, fmt.Errorf("invalid wav header")
 	}
 	if bitsPerSample != 8 && bitsPerSample != 16 {
-		return "", 0, fmt.Errorf("unsupported bit depth")
+		return nil, 0, fmt.Errorf("unsupported bit depth")
 	}
 
 	dataOffset := 12
@@ -102,12 +143,12 @@ func extractPitchFromWAV(data []byte) (string, int, error) {
 		}
 	}
 	if dataSize == 0 || dataOffset+dataSize > len(data) {
-		return "", 0, fmt.Errorf("wav data chunk not found")
+		return nil, 0, fmt.Errorf("wav data chunk not found")
 	}
 
 	frameSize := (bitsPerSample / 8) * numChannels
 	if frameSize <= 0 {
-		return "", 0, fmt.Errorf("invalid frame size")
+		return nil, 0, fmt.Errorf("invalid frame size")
 	}
 
 	samples := make([]float64, 0, dataSize/frameSize)
@@ -124,7 +165,14 @@ func extractPitchFromWAV(data []byte) (string, int, error) {
 		samples = append(samples, sum/float64(numChannels))
 	}
 	if len(samples) < 2 {
-		return "", 0, fmt.Errorf("not enough audio samples")
+		return nil, 0, fmt.Errorf("not enough audio samples")
+	}
+	return samples, sampleRate, nil
+}
+
+func estimateFrequency(samples []float64, sampleRate int) float64 {
+	if len(samples) < 2 || sampleRate <= 0 {
+		return 0
 	}
 
 	zeroCrossings := 0
@@ -138,20 +186,9 @@ func extractPitchFromWAV(data []byte) (string, int, error) {
 
 	durationSeconds := float64(len(samples)) / float64(sampleRate)
 	if durationSeconds <= 0 {
-		return "", 0, fmt.Errorf("invalid audio duration")
+		return 0
 	}
-
-	frequency := float64(zeroCrossings) / (2 * durationSeconds)
-	if frequency <= 0 {
-		return "", 0, fmt.Errorf("unable to estimate note frequency")
-	}
-
-	note := noteNameForFrequency(frequency)
-	duration := int(math.Ceil(durationSeconds * 4))
-	if duration < 1 {
-		duration = 1
-	}
-	return note, duration, nil
+	return float64(zeroCrossings) / (2 * durationSeconds)
 }
 
 func noteNameForFrequency(frequency float64) string {
