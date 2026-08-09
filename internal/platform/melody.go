@@ -7,7 +7,6 @@ import (
 	"math"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 // MelodyNote represents a simplified extracted note for downstream conversion.
@@ -23,19 +22,10 @@ type MelodyData struct {
 }
 
 // ExtractMelodyFromAudioFile creates a temporary melody representation from a local audio file.
-// It parses simple PCM WAV audio and estimates the dominant pitch, falling back to a filename-based
-// placeholder for unsupported formats so the downstream conversion pipeline can still run.
+// It currently supports PCM WAV decoding and returns clear errors for unsupported formats.
 func ExtractMelodyFromAudioFile(path string) (*MelodyData, error) {
 	if err := ValidateAudioFilePath(path); err != nil {
 		return nil, fmt.Errorf("invalid audio file: %w", err)
-	}
-
-	info, err := os.Stat(path)
-	if err != nil {
-		return nil, fmt.Errorf("read audio file: %w", err)
-	}
-	if info.IsDir() {
-		return nil, fmt.Errorf("audio file path points to a directory")
 	}
 
 	data, err := os.ReadFile(path)
@@ -43,18 +33,14 @@ func ExtractMelodyFromAudioFile(path string) (*MelodyData, error) {
 		return nil, fmt.Errorf("read audio file: %w", err)
 	}
 
+	ext := filepath.Ext(path)
+	if ext != ".wav" && ext != ".WAV" {
+		return nil, fmt.Errorf("decode audio file: unsupported format for melody extraction (%s)", ext)
+	}
+
 	notes, err := extractNoteStreamFromWAV(data)
 	if err != nil {
-		baseName := strings.TrimSuffix(filepath.Base(path), filepath.Ext(path))
-		if strings.TrimSpace(baseName) == "" {
-			baseName = "melody"
-		}
-		return &MelodyData{
-			SourcePath: path,
-			Notes: []MelodyNote{
-				{Pitch: baseName, Duration: 1},
-			},
-		}, nil
+		return nil, fmt.Errorf("decode audio file: %w", err)
 	}
 
 	return &MelodyData{

@@ -6,31 +6,23 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
-func TestExtractMelodyFromAudioFileReturnsMelodyData(t *testing.T) {
+func TestExtractMelodyFromAudioFileRejectsUndecodableWAV(t *testing.T) {
 	tempDir := t.TempDir()
 	filePath := filepath.Join(tempDir, "sample.wav")
 	if err := os.WriteFile(filePath, []byte("audio"), 0o644); err != nil {
 		t.Fatalf("failed to create temp audio file: %v", err)
 	}
 
-	data, err := ExtractMelodyFromAudioFile(filePath)
-	if err != nil {
-		t.Fatalf("expected melody extraction to succeed: %v", err)
+	_, err := ExtractMelodyFromAudioFile(filePath)
+	if err == nil {
+		t.Fatal("expected invalid wav data to fail extraction")
 	}
-	if data == nil {
-		t.Fatal("expected melody data to be returned")
-	}
-	if data.SourcePath != filePath {
-		t.Fatalf("unexpected source path: %s", data.SourcePath)
-	}
-	if len(data.Notes) != 1 {
-		t.Fatalf("expected a single melody note, got %d", len(data.Notes))
-	}
-	if got := data.Notes[0].Pitch; got != "sample" {
-		t.Fatalf("unexpected pitch: %s", got)
+	if !strings.Contains(err.Error(), "decode audio file") {
+		t.Fatalf("unexpected error: %v", err)
 	}
 }
 
@@ -63,6 +55,22 @@ func TestExtractMelodyFromAudioFileRejectsInvalidPath(t *testing.T) {
 	_, err := ExtractMelodyFromAudioFile("missing.wav")
 	if err == nil {
 		t.Fatal("expected invalid path to fail")
+	}
+}
+
+func TestExtractMelodyFromAudioFileRejectsUnsupportedFormat(t *testing.T) {
+	tempDir := t.TempDir()
+	filePath := filepath.Join(tempDir, "sample.mp3")
+	if err := os.WriteFile(filePath, []byte("audio"), 0o644); err != nil {
+		t.Fatalf("failed to create temp audio file: %v", err)
+	}
+
+	_, err := ExtractMelodyFromAudioFile(filePath)
+	if err == nil {
+		t.Fatal("expected unsupported format to fail extraction")
+	}
+	if !strings.Contains(err.Error(), "unsupported format") {
+		t.Fatalf("unexpected error: %v", err)
 	}
 }
 

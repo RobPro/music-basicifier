@@ -16,43 +16,6 @@ import (
 
 const mainWindowTitle = "Music Basicifier"
 
-func buildConversionInputFromAudioFile(path string) (*platform.ConversionInput, error) {
-	melody, err := platform.ExtractMelodyFromAudioFile(path)
-	if err != nil {
-		return nil, err
-	}
-	return platform.BuildConversionInput(melody)
-}
-
-func buildPreviewText(bundle *platform.OutputBundle) string {
-	if bundle == nil {
-		return ""
-	}
-	return bundle.QBASIC + "\n\n" + bundle.Adafruit
-}
-
-func buildCopyText(preview string) string {
-	return preview
-}
-
-func buildErrorMessage(err error) string {
-	if err == nil {
-		return ""
-	}
-	return err.Error()
-}
-
-func buildEmptyPreviewText() string {
-	return "No output yet. Confirm an input to generate preview text."
-}
-
-func buildPreviewStatusText(hasOutput bool) string {
-	if hasOutput {
-		return "Preview ready"
-	}
-	return "Waiting for input"
-}
-
 func buildMainWindow(a fyne.App) fyne.Window {
 	w := a.NewWindow(mainWindowTitle)
 	urlEntry := widget.NewEntry()

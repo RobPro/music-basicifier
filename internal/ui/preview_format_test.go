@@ -6,7 +6,7 @@ import (
 	"github.com/RobPro/music-basicifier/internal/platform"
 )
 
-func TestBuildPreviewTextFormatsBundle(t *testing.T) {
+func TestBuildPreviewTextFormatsBundleLegacy(t *testing.T) {
 	bundle := &platform.OutputBundle{QBASIC: "10 REM test", Adafruit: "let melody = []"}
 	got := buildPreviewText(bundle)
 	want := "10 REM test\n\nlet melody = []"
