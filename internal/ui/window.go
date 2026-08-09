@@ -31,6 +31,10 @@ func buildPreviewText(bundle *platform.OutputBundle) string {
 	return bundle.QBASIC + "\n\n" + bundle.Adafruit
 }
 
+func buildCopyText(preview string) string {
+	return preview
+}
+
 func buildMainWindow(a fyne.App) fyne.Window {
 	w := a.NewWindow(mainWindowTitle)
 	urlEntry := widget.NewEntry()
@@ -96,7 +100,7 @@ func buildMainWindow(a fyne.App) fyne.Window {
 	}
 
 	copyButton := widget.NewButton("Copy Output", func() {
-		if err := platform.CopyTextToClipboard("Sample output"); err != nil {
+		if err := platform.CopyTextToClipboard(buildCopyText(outputPreview.Text)); err != nil {
 			dialog.ShowError(fmt.Errorf("could not copy output: %w", err), w)
 			return
 		}
