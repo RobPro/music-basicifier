@@ -1,7 +1,12 @@
 // Package ui contains Fyne application setup and top-level window wiring.
 package ui
 
-import "github.com/RobPro/music-basicifier/internal/platform"
+import (
+	"fmt"
+	"strings"
+
+	"github.com/RobPro/music-basicifier/internal/platform"
+)
 
 func buildPreviewText(bundle *platform.OutputBundle) string {
 	if bundle == nil {
@@ -10,8 +15,11 @@ func buildPreviewText(bundle *platform.OutputBundle) string {
 	return bundle.QBASIC + "\n\n" + bundle.Adafruit
 }
 
-func buildCopyText(preview string) string {
-	return preview
+func buildCopyText(preview string) (string, error) {
+	if strings.TrimSpace(preview) == "" || preview == buildEmptyPreviewText() {
+		return "", fmt.Errorf("no output available to copy")
+	}
+	return preview, nil
 }
 
 func buildErrorMessage(err error) string {
