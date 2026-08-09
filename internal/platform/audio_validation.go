@@ -3,6 +3,7 @@ package platform
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -21,13 +22,21 @@ func ValidateAudioFilePath(path string) error {
 		return fmt.Errorf("audio file path points to a directory")
 	}
 
+	file, err := os.Open(trimmed)
+	if err != nil {
+		return fmt.Errorf("audio file is not readable: %w", err)
+	}
+	if err := file.Close(); err != nil {
+		return fmt.Errorf("audio file is not readable: %w", err)
+	}
+
 	supportedExtensions := []string{".wav", ".m4u", ".mp3"}
-	lowerPath := strings.ToLower(trimmed)
+	lowerPath := strings.ToLower(filepath.Ext(trimmed))
 	for _, ext := range supportedExtensions {
-		if strings.HasSuffix(lowerPath, ext) {
+		if lowerPath == ext {
 			return nil
 		}
 	}
 
-	return fmt.Errorf("unsupported audio format")
+	return fmt.Errorf("unsupported audio format: expected .wav, .m4u, or .mp3")
 }
