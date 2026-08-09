@@ -41,6 +41,7 @@ func buildMainWindow(a fyne.App) fyne.Window {
 			downloadDir := filepath.Join("C:/", "source", "music-basicifier", "downloads")
 			outputPath, err := platform.DownloadYouTubeAudio(url, downloadDir)
 			if err != nil {
+				_ = platform.LogError(fmt.Sprintf("could not download YouTube audio: %v", err))
 				dialog.ShowError(fmt.Errorf("could not download YouTube audio: %w", err), w)
 				return
 			}
@@ -49,6 +50,7 @@ func buildMainWindow(a fyne.App) fyne.Window {
 		}
 
 		if err := platform.ValidateAudioFilePath(audioFileEntry.Text); err != nil {
+			_ = platform.LogError(fmt.Sprintf("invalid audio file: %v", err))
 			dialog.ShowError(fmt.Errorf("invalid audio file: %w", err), w)
 			return
 		}
