@@ -24,6 +24,13 @@ func buildConversionInputFromAudioFile(path string) (*platform.ConversionInput, 
 	return platform.BuildConversionInput(melody)
 }
 
+func buildPreviewText(bundle *platform.OutputBundle) string {
+	if bundle == nil {
+		return ""
+	}
+	return bundle.QBASIC + "\n\n" + bundle.Adafruit
+}
+
 func buildMainWindow(a fyne.App) fyne.Window {
 	w := a.NewWindow(mainWindowTitle)
 	urlEntry := widget.NewEntry()
@@ -77,7 +84,7 @@ func buildMainWindow(a fyne.App) fyne.Window {
 			dialog.ShowError(fmt.Errorf("could not generate outputs: %w", err), w)
 			return
 		}
-		outputPreview.SetText(bundle.QBASIC + "\n\n" + bundle.Adafruit)
+		outputPreview.SetText(buildPreviewText(bundle))
 		dialog.ShowInformation("Input received", buildConfirmationMessage(urlEntry.Text, audioFileEntry.Text), w)
 	})
 
