@@ -84,7 +84,12 @@ func buildMainWindow(a fyne.App) fyne.Window {
 	}
 
 	copyButton := widget.NewButton("Copy Output", func() {
-		if err := platform.CopyTextToClipboard(buildCopyText(outputPreview.Text)); err != nil {
+		copyText, err := buildCopyText(outputPreview.Text)
+		if err != nil {
+			dialog.ShowError(fmt.Errorf("could not copy output: %w", err), w)
+			return
+		}
+		if err := platform.CopyTextToClipboard(copyText); err != nil {
 			dialog.ShowError(fmt.Errorf("could not copy output: %w", err), w)
 			return
 		}
